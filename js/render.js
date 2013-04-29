@@ -15,7 +15,7 @@ function render() {
     for ( var x = 0; x < COLS; ++x ) {
         for ( var y = 0; y < ROWS; ++y ) {
             if ( board[ y ][ x ] ) {
-                ctx.fillStyle = colors[ board[ y ][ x ] - 1 ];
+                ctx.fillStyle = board[ y ][ x ];
                 drawBlock( x, y );
             }
         }
@@ -23,10 +23,10 @@ function render() {
 
     ctx.fillStyle = 'red';
     ctx.strokeStyle = 'black';
-    for ( var y = 0; y < 4; ++y ) {
-        for ( var x = 0; x < 4; ++x ) {
+    for ( var y = 0; y < 2; ++y ) {
+        for ( var x = 0; x < 2; ++x ) {
             if ( current[ y ][ x ] ) {
-                ctx.fillStyle = colors[ current[ y ][ x ] - 1 ];
+                ctx.fillStyle =  current[ y ][ x ];
                 drawBlock( currentX + x, currentY + y );
             }
         }
