@@ -43,9 +43,10 @@ function init() {
 function tick() {
     if ( valid( 0, 1 ) ) {
         ++currentY;
-    }
-    else {
-        freeze();
+    } else {
+        if(freeze()){
+        	return;
+        }
         clear();
         if (lose) {
             newGame();
@@ -56,13 +57,28 @@ function tick() {
 }
 
 function freeze() {
-    for ( var y = 0; y < 2; ++y ) {
+    for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
-            if ( current[ y ][ x ] ) {
-                board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
+            if ( (y + currentY) >= ROWS - 1  
+            	||	board[ y + 1 +currentY][ x + currentX ] != 0){
+                if ( current[ y ][ x ] ) {
+                    board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
+                    current[y][x] = 0;
+                }
             }
         }
     }
+
+    for ( var y = 1; 0 <= y; --y ) {
+        for ( var x = 0; x < 2; ++x ) {
+    		if( current[y][x] ){
+    			return true;
+    		}
+    	}
+    }
+    
+    return false;
+    
 }
 
 function rotate( current ) {
