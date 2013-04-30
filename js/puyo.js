@@ -1,4 +1,4 @@
-var COLS = 10, ROWS = 20;
+var COLS = 6, ROWS = 14;
 var board = []; 
 var lose;
 var interval;
@@ -11,8 +11,8 @@ var color_index =0;
 function newShape() {
 	col = puyocolors[color_index];
     current = [[col[0],0],[col[1],0]];
-    currentX = 5;
-    currentY = 0;
+    currentX = 2;
+    currentY = 2;
     color_index  = ( color_index + 1 ) % puyocolors.length;
 }
 
