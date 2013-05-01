@@ -1,13 +1,14 @@
-var COLS = 6, ROWS = 14;
-var board = []; 
-var lose;     //flag
-var interval; //interval Timer ID
-var current;  //falling object
-var currentX, currentY; // position
-var newX, newY;         // position candidate
-var colors = ['blue', 'yellow' ,'red', 'green'];
-var puyocolors = [];
-var color_index =0;
+var COLS = 6;  //列数
+var ROWS = 14; //行数
+var board = []; //盤情報(何色のぷよがどこに存在するか?)
+var lose;     //ゲーム終了フラグ
+var interval; //tick関数用のタイマID
+var current;  //おちているぷよの形情報
+var currentX, currentY; // おちているぷよの位置情報
+var newX, newY;         // ぷよの移動先の候補
+var colors = ['blue', 'yellow' ,'red', 'green']; //ぷよの色
+var puyocolors = []; //ぷよの色の配列(createColors参照)
+var color_index =0;  //ぷよの色の配列のインデックス
 
 function newShape() {
     var col = puyocolors[color_index];
@@ -17,20 +18,14 @@ function newShape() {
     color_index  = ( color_index + 1 ) % puyocolors.length;
 }
 
-function init() {
-    // initialize board 
-    for ( var y = 0; y < ROWS; ++y ) {
-        board[ y ] = [];
-        for ( var x = 0; x < COLS; ++x ) {
-            board[ y ][ x ] = 0;
-        }
-    }
-    
+function createColors(){
+    var cols = [64,64,64,64];
+
     for ( var y = 0; y < 128; ++y ) {
         puyocolors[ y ] = [0,0];
     }
-    
-    var cols = [64,64,64,64];
+
+	//128回分のおちぷよ(2*128で256個)の色を決める
     for (var x = 0; x < 256; x) {
     	var cur = (Math.ceil(Math.random()*cols.length))%cols.length;
     	if ( cols[cur] > 0 ) {
@@ -39,6 +34,16 @@ function init() {
     	    x++;
     	}
     }
+}
+
+function init() {
+    for ( var y = 0; y < ROWS; ++y ) {
+        board[ y ] = [];
+        for ( var x = 0; x < COLS; ++x ) {
+            board[ y ][ x ] = 0;
+        }
+    }
+	createColors();
 }
 
 function tick() {
@@ -57,23 +62,22 @@ function tick() {
     }
 }
 
-prevcur = []
 
 function freeze() {
-    prevcur = [];
     for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
-            if ( (y + currentY) >= ROWS - 1  
-            	 ||	board[ y + 1 +currentY][ x + currentX ] != 0){
+			//底についた、もしくは下にぷよがある場合
+            if ( (y + currentY) >= (ROWS - 1)  ||	
+				 board[ y + 1 +currentY][ x + currentX ] != 0){
                 if ( current[ y ][ x ] ) {
                     board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
                     current[y][x] = 0;
-                    prevcur.push({x:x,y:y})
                 }
             }
         }
     }
 
+	//おちぷよが残っている場合
     for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
     	    if( current[y][x] ){
@@ -86,6 +90,7 @@ function freeze() {
     
 }
 
+//右回転
 function rotate( current ) {
 	newX =0;
 	newY =0;
@@ -115,6 +120,7 @@ function rotate( current ) {
     return newCurrent;
 }
 
+//左回転
 function leftRotate( current ) {
 
 	newX =0;
@@ -143,16 +149,17 @@ function leftRotate( current ) {
     return newCurrent;
 }
 
+//一時停止/再開
 function pauseScreen(){
     if ( interval != 0 ){
 		clearInterval( interval );
 		interval = 0;
-    }
-    else {
+    }else {
 		interval = setInterval( tick, 250 )
     }
 }
 
+//ぷよ削除
 function clear() {
 
     var is_erased;
@@ -161,12 +168,14 @@ function clear() {
  		for ( var y = 0; y < ROWS; ++y ) {
       	    for ( var x = 0; x < COLS; ++x ) {
 				if ( board[y][x] != 0) {
+					//ボードの各要素にぷよがある場合は削除処理
 					if ( clearPuyo(x,y) ) {
 						is_erased = true;
 					}
 				}
 			}
     	}
+		//空きができたら詰める
     	if (is_erased) packPuyos();
 
     }while(is_erased);
@@ -174,17 +183,22 @@ function clear() {
 
 }
 
+//ぷよをつめる
 function packPuyos(){
     for ( var x = 0; x < COLS; ++x ) {
 		for ( var y = 0; y < ROWS-1; ++y ) {
-			if (board[ROWS - y - 2][x] != 0){
-	    		var my = ROWS - y - 1
+			var starty = ROWS - y - 2
+			//ぷよが存在する場合
+			if (board[starty][x] != 0){
+				//何個下までぷよがないかを探索
+	    		var my = starty + 1
 	    		for ( ; my < ROWS; my++) {
 	    			if ( board[my][x] != 0) break;
 	    		}
-	    		if (my != ROWS - y - 1 &&  board[my-1][x] == 0) {
-	    			board[my-1][x]  = board[ROWS -y -2][x];
-	    			board[ROWS -y -2][x] = 0;
+				//ぷよが下にない場合、移動
+	    		if (my != starty + 1 &&  board[my-1][x] == 0) {
+	    			board[my-1][x]  = board[starty][x];
+	    			board[starty][x] = 0;
 	    		}		
 				
 			}
@@ -197,7 +211,6 @@ function createPuyo(x,y,col){
     var puyo = {x: x , y: y, col: col};
     return puyo
 }
-
 
 function clearPuyo(x,y) {
     // 探索済箇所
@@ -230,6 +243,17 @@ function clearPuyo(x,y) {
     return false;
 }
 
+function checkPuyo(cond,x,y,col,same_puyos,marked){
+    if(cond){
+		if(board[y][x] == col ){
+			same_puyos.push(createPuyo(x,y,col)); 
+			findPuyos(same_puyos,marked);
+		}else{
+			marked[y][x] = true;
+		}
+	}
+}
+
 function findPuyos(same_puyos,marked){
 
     //same_puyosの中の最後のぷよを基準にする
@@ -253,54 +277,22 @@ function findPuyos(same_puyos,marked){
     //既に探索済であればなにもしない
     if(	marked[puyo.y][puyo.x] == true) {
 		return;
-    }else{
-		marked[puyo.y][puyo.x] = true;
     }
 
-    //左側のぷよのチェック
+	marked[puyo.y][puyo.x] = true;
     var x = puyo.x;
     var y = puyo.y;
     var col = puyo.col;
-    if(x>0 ){
-		if(board[y][x-1] == col ){
-			same_puyos.push(createPuyo(x-1,y,puyo.col)); 
-			findPuyos(same_puyos,marked);
-		}else{
-			marked[y][x-1] = true;
-		}
-    }
 
-    //右側のぷよが同じ色
-    if(x<COLS-1){
-		if(board[y][x+1] == col){
-			same_puyos.push(createPuyo(x+1,y,puyo.col)); 
-			findPuyos(same_puyos,marked);
-		}else{
-			marked[y][x+1] = true;
-		}
-    }
-    
-    //上のぷよが同じ色の場合
-    if(y>1){
-		if(board[y-1][x] == col ){
-			same_puyos.push(createPuyo(x,y-1,col)); 
-			findPuyos(same_puyos,marked);
-		}else{
-			marked[y-1][x] = true;
-		}
-    }
+    //左のぷよのチェック
+	checkPuyo(x>0,x-1,y,col,same_puyos,marked);	
+    //右のぷよのチェック
+	checkPuyo(x<COLS-1,x-1,y,col,same_puyos,marked);	
+    //上のぷよのチェック
+	checkPuyo(y>1,x,y-1,col,same_puyos,marked);	
+    //下のぷよのチェック
+	checkPuyo(y<ROWS-1,x,y+1,col,same_puyos,marked);	
 
-    //下のぷよが同じ色の場合
-    if(y<ROWS-1){
-		if (board[y+1][x] == col ){
-			same_puyos.push(createPuyo(x,y+1,col)); 
-			findPuyos(same_puyos,marked);
-		}else{
-			marked[y+1][x] = true;
-		}
-    }
-
-    return;
 }
 
 function keyPress( key ) {
