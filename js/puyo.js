@@ -12,7 +12,7 @@ function newShape() {
 	col = puyocolors[color_index];
     current = [[col[0],0],[col[1],0]];
     currentX = 2;
-    currentY = 2;
+    currentY = 1;
     color_index  = ( color_index + 1 ) % puyocolors.length;
 }
 
@@ -292,7 +292,7 @@ function valid( offsetX, offsetY, newCurrent ) {
                   || x + offsetX < 0
                   || y + offsetY >= ROWS
                   || x + offsetX >= COLS ) {
-                    if (offsetY == 1) lose = true;
+                    if (offsetY == 3 && offsetX == 2) lose = true;
                     return false;
                 }
             }
