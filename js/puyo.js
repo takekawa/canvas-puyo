@@ -9,7 +9,7 @@ var puyocolors = [];
 var color_index =0;
 
 function newShape() {
-    col = puyocolors[color_index];
+    var col = puyocolors[color_index];
     current = [[col[0],0],[col[1],0]];
     currentX = 2;
     currentY = 1;
@@ -77,7 +77,7 @@ function freeze() {
     for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
     	    if( current[y][x] ){
-    		return true;
+    			return true;
     	    }
     	}
     }
@@ -88,16 +88,16 @@ function freeze() {
 
 function rotate( current ) {
     if (current[0][0] != 0 ){
-	if ( current[0][1] != 0 ){
-	    currentX--;
-	}else if ( current[1][0] != 0){
-	    currentY++;}
-	
+		if ( current[0][1] != 0 ){
+			currentX--;
+		}else if ( current[1][0] != 0){
+			currentY++;}
+		
     }else if ( current[1][1] != 0 ){
-	if ( current[0][1] != 0 ){
-	    currentY--;
-	}else if ( current[1][0] != 0){
-	    currentX++;}
+		if ( current[0][1] != 0 ){
+			currentY--;
+		}else if ( current[1][0] != 0){
+			currentX++;}
     }
     
     var newCurrent = [];    
@@ -114,16 +114,16 @@ function rotate( current ) {
 function leftRotate( current ) {
 
     if (current[0][0] != 0 ){
-	if ( current[0][1] != 0 ){
-	    currentY--;
-	}else if ( current[1][0] != 0){
-	    currentX--;}
-	
+		if ( current[0][1] != 0 ){
+			currentY--;
+		}else if ( current[1][0] != 0){
+			currentX--;}
+		
     }else if ( current[1][1] != 0 ){
-	if ( current[0][1] != 0 ){
-	    currentX++;
-	}else if ( current[1][0] != 0){
-	    currentY++;}
+		if ( current[0][1] != 0 ){
+			currentX++;
+		}else if ( current[1][0] != 0){
+			currentY++;}
     }
 
     
@@ -139,11 +139,11 @@ function leftRotate( current ) {
 
 function pauseScreen(){
     if ( interval != 0 ){
-	clearInterval( interval );
-	interval = 0;
+		clearInterval( interval );
+		interval = 0;
     }
     else {
-	interval = setInterval( tick, 250 )
+		interval = setInterval( tick, 250 )
     }
 }
 
@@ -152,15 +152,14 @@ function clear() {
     var is_erased;
     do {
     	is_erased = false;
- 	for ( var y = 0; y < ROWS; ++y ) {
+ 		for ( var y = 0; y < ROWS; ++y ) {
       	    for ( var x = 0; x < COLS; ++x ) {
-		if ( board[y][x] != 0) {
-		    if ( clearPuyo(x,y) ) {
-			is_erased = true;
-		    }
-		}
-	    }
-	    if (is_erased) break;
+				if ( board[y][x] != 0) {
+					if ( clearPuyo(x,y) ) {
+						is_erased = true;
+					}
+				}
+			}
     	}
     	if (is_erased) packPuyos();
 
@@ -171,19 +170,19 @@ function clear() {
 
 function packPuyos(){
     for ( var x = 0; x < COLS; ++x ) {
-	for ( var y = 0; y < ROWS-1; ++y ) {
-	    if (board[ROWS - y - 2][x] != 0){
-	    	var my = ROWS - y - 1
-	    	for ( ; my < ROWS; my++) {
-	    		if ( board[my][x] != 0) break;
-	    	}
-	    	if (my != ROWS - y - 1 &&  board[my-1][x] == 0) {
-	    		board[my-1][x]  = board[ROWS -y -2][x];
-	    		board[ROWS -y -2][x] = 0;
-	    	}		
-	     
-	    }
-	}
+		for ( var y = 0; y < ROWS-1; ++y ) {
+			if (board[ROWS - y - 2][x] != 0){
+	    		var my = ROWS - y - 1
+	    		for ( ; my < ROWS; my++) {
+	    			if ( board[my][x] != 0) break;
+	    		}
+	    		if (my != ROWS - y - 1 &&  board[my-1][x] == 0) {
+	    			board[my-1][x]  = board[ROWS -y -2][x];
+	    			board[ROWS -y -2][x] = 0;
+	    		}		
+				
+			}
+		}
     }
     
 }
@@ -198,16 +197,16 @@ function clearPuyo(x,y) {
     // 探索済箇所
     var marked = [] 
     for (var i = 0 ; i< ROWS; i++ ){
-	marked[i] = []
-	for (var j = 0 ; j< COLS; j++ ){
-	    marked[i][j] = 0
-	}
+		marked[i] = []
+		for (var j = 0 ; j< COLS; j++ ){
+			marked[i][j] = 0
+		}
     }
 
     //ぷよ(削除対象のぷよを指定するために利用
     var puyo = createPuyo(x,y,board[y][x]);
     //おなじ色のぷよグループ
-    same_puyos = [puyo];
+    var same_puyos = [puyo];
 
     //ぷよが存在しなければ、なにもしない。
     if(puyo.col == 0) return false;
@@ -217,82 +216,82 @@ function clearPuyo(x,y) {
 
     //ぷよの集合が4つ以上からなる場合
     if(same_puyos.length >= 4){
-	while( puyo = same_puyos.pop()){
-	    board[puyo.y][puyo.x] = 0;
-	}
-	return true
+		while( puyo = same_puyos.pop()){
+			board[puyo.y][puyo.x] = 0;
+		}
+		return true
     }
     return false;
 }
 
-function findPuyos(array,marked){
+function findPuyos(same_puyos,marked){
 
-    //arrayの中の最後のぷよを基準にする
-    var puyo = array.pop()
+    //same_puyosの中の最後のぷよを基準にする
+    var puyo = same_puyos.pop()
     
-    //既にarray中に同じぷよが存在していれば、なにもしない
-    for(var i = 0; i<array.length; i++){
-	if (array[i].x  == puyo.x
-	    && array[i].y == puyo.y
-	    && array[i].col == puyo.col){
-	    return;
-	}
+    //既にsame_puyos中に同じぷよが存在していれば、なにもしない
+    for(var i = 0; i<same_puyos.length; i++){
+		if (same_puyos[i].x  == puyo.x
+			&& same_puyos[i].y == puyo.y
+			&& same_puyos[i].col == puyo.col){
+			return;
+		}
     }
-    array.push(puyo);
+    same_puyos.push(puyo);
 
     if(puyo.col == 0) {
-	marked[puyo.y][puyo.x] = true;
-	return;
+		marked[puyo.y][puyo.x] = true;
+		return;
     }
 
     //既に探索済であればなにもしない
     if(	marked[puyo.y][puyo.x] == true) {
-	return;
+		return;
     }else{
-	marked[puyo.y][puyo.x] = true;
+		marked[puyo.y][puyo.x] = true;
     }
 
     //左側のぷよのチェック
-    x = puyo.x;
-    y = puyo.y;
-    col = puyo.col;
-    if(x>1 ){
-	if(board[y][x-1] == col ){
-	    same_puyos.push(createPuyo(x-1,y,puyo.col)); 
-	    findPuyos(same_puyos,marked);
-	}else{
-	    marked[y][x-1] = true;
-	}
+    var x = puyo.x;
+    var y = puyo.y;
+    var col = puyo.col;
+    if(x>0 ){
+		if(board[y][x-1] == col ){
+			same_puyos.push(createPuyo(x-1,y,puyo.col)); 
+			findPuyos(same_puyos,marked);
+		}else{
+			marked[y][x-1] = true;
+		}
     }
 
     //右側のぷよが同じ色
     if(x<COLS-1){
-	if(board[y][x+1] == col){
-	    same_puyos.push(createPuyo(x+1,y,puyo.col)); 
-	    findPuyos(same_puyos,marked);
-	}else{
-	    marked[y][x+1] = true;
-	}
+		if(board[y][x+1] == col){
+			same_puyos.push(createPuyo(x+1,y,puyo.col)); 
+			findPuyos(same_puyos,marked);
+		}else{
+			marked[y][x+1] = true;
+		}
     }
     
     //上のぷよが同じ色の場合
     if(y>1){
-	if(board[y-1][x] == col ){
-	    same_puyos.push(createPuyo(x,y-1,col)); 
-	    findPuyos(same_puyos,marked);
-	}else{
-	    marked[y-1][x] = true;
-	}
+		if(board[y-1][x] == col ){
+			same_puyos.push(createPuyo(x,y-1,col)); 
+			findPuyos(same_puyos,marked);
+		}else{
+			marked[y-1][x] = true;
+		}
     }
 
     //下のぷよが同じ色の場合
     if(y<ROWS-1){
-	if (board[y+1][x] == col ){
-	    same_puyos.push(createPuyo(x,y+1,col)); 
-	    findPuyos(same_puyos,marked);
-	}else{
-	    marked[y+1][x] = true;
-	}
+		if (board[y+1][x] == col ){
+			same_puyos.push(createPuyo(x,y+1,col)); 
+			findPuyos(same_puyos,marked);
+		}else{
+			marked[y+1][x] = true;
+		}
     }
 
     return;
@@ -364,8 +363,6 @@ function valid( offsetX, offsetY, newCurrent ) {
 }
 
 function newGame() {
-
-
     clearInterval(interval);
     init();
     newShape();
