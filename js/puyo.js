@@ -107,6 +107,42 @@ function rotate( current ) {
     return newCurrent;
 }
 
+function leftRotate( current ) {
+
+	if (current[0][0] != 0 ){
+		if ( current[0][1] != 0 ){
+		   currentY--;
+		}else if ( current[1][0] != 0){
+		   currentX--;}
+		
+	}else if ( current[1][1] != 0 ){
+	    if ( current[0][1] != 0 ){
+		   currentX++;
+		}else if ( current[1][0] != 0){
+		   currentY++;}
+	}
+
+	
+	var newCurrent = [[0,0],[0,0]];    
+    for ( var y = 0; y < 2; ++y ) {
+        for ( var x = 0; x < 2; ++x ) {
+            newCurrent[1-y][x] = current[x][y];
+        }
+    }
+
+    return newCurrent;
+}
+
+function pauseScreen(){
+	if ( interval != 0 ){
+		clearInterval( interval );
+		interval = 0;
+	}
+	else {
+		interval = setInterval( tick, 250 )
+	}
+}
+
 function clear() {
     return
     var is_erased = false
@@ -285,8 +321,19 @@ function keyPress( key ) {
                 current = rotated;
             }
             break;
+        case 'leftRotate':
+            var leftRotated = leftRotate( current );
+            if ( valid( 0, 0, leftRotated ) ) {
+                current = leftRotated;
+            }
+            break;
+        case 'pauseScreen':
+            pauseScreen();
+            break;
     }
 }
+
+
 
 function valid( offsetX, offsetY, newCurrent ) {
     offsetX = offsetX || 0;
@@ -307,6 +354,7 @@ function valid( offsetX, offsetY, newCurrent ) {
                   || y + offsetY >= ROWS
                   || x + offsetX >= COLS ) {
                     if (offsetY == 3 && offsetX == 2) lose = true;
+                    if (offsetY == 2 && offsetX == 2) lose = true;
                     return false;
                 }
             }
@@ -316,6 +364,8 @@ function valid( offsetX, offsetY, newCurrent ) {
 }
 
 function newGame() {
+
+
     clearInterval(interval);
     init();
     newShape();
