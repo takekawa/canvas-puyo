@@ -1,9 +1,10 @@
 var COLS = 6, ROWS = 14;
 var board = []; 
-var lose;
-var interval;
-var current; //
+var lose;     //flag
+var interval; //interval Timer ID
+var current;  //falling object
 var currentX, currentY; // position
+var newX, newY;         // position candidate
 var colors = ['blue', 'yellow' ,'red', 'green'];
 var puyocolors = [];
 var color_index =0;
@@ -65,7 +66,6 @@ function freeze() {
             if ( (y + currentY) >= ROWS - 1  
             	 ||	board[ y + 1 +currentY][ x + currentX ] != 0){
                 if ( current[ y ][ x ] ) {
-                    //TODO sometimes, this index overflow.
                     board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
                     current[y][x] = 0;
                     prevcur.push({x:x,y:y})
@@ -87,17 +87,21 @@ function freeze() {
 }
 
 function rotate( current ) {
+	newX =0;
+	newY =0;
     if (current[0][0] != 0 ){
 		if ( current[0][1] != 0 ){
-			currentX--;
+			newX = - 1;
 		}else if ( current[1][0] != 0){
-			currentY++;}
+			newY = 1;
+		}
 		
     }else if ( current[1][1] != 0 ){
 		if ( current[0][1] != 0 ){
-			currentY--;
+			newY = -1;
 		}else if ( current[1][0] != 0){
-			currentX++;}
+			newX = 1;
+		}
     }
     
     var newCurrent = [];    
@@ -113,19 +117,21 @@ function rotate( current ) {
 
 function leftRotate( current ) {
 
+	newX =0;
+	newY =0;
     if (current[0][0] != 0 ){
 		if ( current[0][1] != 0 ){
-			currentY--;
+			newY = -1;
 		}else if ( current[1][0] != 0){
-			currentX--;}
-		
+			newX = -1;
+		}
     }else if ( current[1][1] != 0 ){
 		if ( current[0][1] != 0 ){
-			currentX++;
+			newX = +1;
 		}else if ( current[1][0] != 0){
-			currentY++;}
+			newY = +1;
+		}
     }
-
     
     var newCurrent = [[0,0],[0,0]];    
     for ( var y = 0; y < 2; ++y ) {
@@ -194,7 +200,7 @@ function createPuyo(x,y,col){
 
 
 function clearPuyo(x,y) {
-    // ’TõÏ‰ÓŠ
+    // æ¢ç´¢æ¸ˆç®‡æ‰€
     var marked = [] 
     for (var i = 0 ; i< ROWS; i++ ){
 		marked[i] = []
@@ -203,18 +209,18 @@ function clearPuyo(x,y) {
 		}
     }
 
-    //‚Õ‚æ(íœ‘ÎÛ‚Ì‚Õ‚æ‚ğw’è‚·‚é‚½‚ß‚É—˜—p
+    //ã·ã‚ˆ(å‰Šé™¤å¯¾è±¡ã®ã·ã‚ˆã‚’æŒ‡å®šã™ã‚‹ãŸã‚ã«åˆ©ç”¨
     var puyo = createPuyo(x,y,board[y][x]);
-    //‚¨‚È‚¶F‚Ì‚Õ‚æƒOƒ‹[ƒv
+    //ãŠãªã˜è‰²ã®ã·ã‚ˆã‚°ãƒ«ãƒ¼ãƒ—
     var same_puyos = [puyo];
 
-    //‚Õ‚æ‚ª‘¶İ‚µ‚È‚¯‚ê‚ÎA‚È‚É‚à‚µ‚È‚¢B
+    //ã·ã‚ˆãŒå­˜åœ¨ã—ãªã‘ã‚Œã°ã€ãªã«ã‚‚ã—ãªã„ã€‚
     if(puyo.col == 0) return false;
 
-    //“¯‚¶F‚Ì‚Õ‚æ‚ğ’T‚·
+    //åŒã˜è‰²ã®ã·ã‚ˆã‚’æ¢ã™
     findPuyos(same_puyos,marked);
 
-    //‚Õ‚æ‚ÌW‡‚ª4‚ÂˆÈã‚©‚ç‚È‚éê‡
+    //ã·ã‚ˆã®é›†åˆãŒ4ã¤ä»¥ä¸Šã‹ã‚‰ãªã‚‹å ´åˆ
     if(same_puyos.length >= 4){
 		while( puyo = same_puyos.pop()){
 			board[puyo.y][puyo.x] = 0;
@@ -226,10 +232,10 @@ function clearPuyo(x,y) {
 
 function findPuyos(same_puyos,marked){
 
-    //same_puyos‚Ì’†‚ÌÅŒã‚Ì‚Õ‚æ‚ğŠî€‚É‚·‚é
+    //same_puyosã®ä¸­ã®æœ€å¾Œã®ã·ã‚ˆã‚’åŸºæº–ã«ã™ã‚‹
     var puyo = same_puyos.pop()
     
-    //Šù‚Ésame_puyos’†‚É“¯‚¶‚Õ‚æ‚ª‘¶İ‚µ‚Ä‚¢‚ê‚ÎA‚È‚É‚à‚µ‚È‚¢
+    //æ—¢ã«same_puyosä¸­ã«åŒã˜ã·ã‚ˆãŒå­˜åœ¨ã—ã¦ã„ã‚Œã°ã€ãªã«ã‚‚ã—ãªã„
     for(var i = 0; i<same_puyos.length; i++){
 		if (same_puyos[i].x  == puyo.x
 			&& same_puyos[i].y == puyo.y
@@ -244,14 +250,14 @@ function findPuyos(same_puyos,marked){
 		return;
     }
 
-    //Šù‚É’TõÏ‚Å‚ ‚ê‚Î‚È‚É‚à‚µ‚È‚¢
+    //æ—¢ã«æ¢ç´¢æ¸ˆã§ã‚ã‚Œã°ãªã«ã‚‚ã—ãªã„
     if(	marked[puyo.y][puyo.x] == true) {
 		return;
     }else{
 		marked[puyo.y][puyo.x] = true;
     }
 
-    //¶‘¤‚Ì‚Õ‚æ‚Ìƒ`ƒFƒbƒN
+    //å·¦å´ã®ã·ã‚ˆã®ãƒã‚§ãƒƒã‚¯
     var x = puyo.x;
     var y = puyo.y;
     var col = puyo.col;
@@ -264,7 +270,7 @@ function findPuyos(same_puyos,marked){
 		}
     }
 
-    //‰E‘¤‚Ì‚Õ‚æ‚ª“¯‚¶F
+    //å³å´ã®ã·ã‚ˆãŒåŒã˜è‰²
     if(x<COLS-1){
 		if(board[y][x+1] == col){
 			same_puyos.push(createPuyo(x+1,y,puyo.col)); 
@@ -274,7 +280,7 @@ function findPuyos(same_puyos,marked){
 		}
     }
     
-    //ã‚Ì‚Õ‚æ‚ª“¯‚¶F‚Ìê‡
+    //ä¸Šã®ã·ã‚ˆãŒåŒã˜è‰²ã®å ´åˆ
     if(y>1){
 		if(board[y-1][x] == col ){
 			same_puyos.push(createPuyo(x,y-1,col)); 
@@ -284,7 +290,7 @@ function findPuyos(same_puyos,marked){
 		}
     }
 
-    //‰º‚Ì‚Õ‚æ‚ª“¯‚¶F‚Ìê‡
+    //ä¸‹ã®ã·ã‚ˆãŒåŒã˜è‰²ã®å ´åˆ
     if(y<ROWS-1){
 		if (board[y+1][x] == col ){
 			same_puyos.push(createPuyo(x,y+1,col)); 
@@ -316,14 +322,18 @@ function keyPress( key ) {
         break;
     case 'rotate':
         var rotated = rotate( current );
-        if ( valid( 0, 0, rotated ) ) {
+        if ( valid( newX, newY, rotated ) ) {
             current = rotated;
+			currentX = currentX + newX
+			currentY = currentY + newY
         }
         break;
     case 'leftRotate':
         var leftRotated = leftRotate( current );
-        if ( valid( 0, 0, leftRotated ) ) {
+        if ( valid( newX, newY, leftRotated ) ) {
             current = leftRotated;
+			currentX = currentX + newX
+			currentY = currentY + newY
         }
         break;
     case 'pauseScreen':
