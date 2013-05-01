@@ -62,6 +62,7 @@ function freeze() {
             if ( (y + currentY) >= ROWS - 1  
             	||	board[ y + 1 +currentY][ x + currentX ] != 0){
                 if ( current[ y ][ x ] ) {
+                	//TODO sometimes, this index overflow.
                     board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
                     current[y][x] = 0;
                 }
@@ -82,7 +83,20 @@ function freeze() {
 }
 
 function rotate( current ) {
-    var newCurrent = [];
+	if (current[0][0] != 0 ){
+		if ( current[0][1] != 0 ){
+		   currentX--;
+		}else if ( current[1][0] != 0){
+		   currentY++;}
+		
+	}else if ( current[1][1] != 0 ){
+	    if ( current[0][1] != 0 ){
+		   currentY--;
+		}else if ( current[1][0] != 0){
+		   currentX++;}
+	}
+	
+	var newCurrent = [];    
     for ( var y = 0; y < 2; ++y ) {
         newCurrent[ y ] = [];
         for ( var x = 0; x < 2; ++x ) {
