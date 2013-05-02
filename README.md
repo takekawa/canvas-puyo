@@ -1,8 +1,11 @@
 A very simple HTML5 version of Puyo Puyo, for educational purposes, made in 3 months :)
+
 It's derived from https://github.com/dionyziz/canvas-tetris
 
 Play: 
+
   git clone git@github.com:takekawa/canvas-puyo.git
+
   click the index.html
 
 License
