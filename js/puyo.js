@@ -209,23 +209,20 @@ function packPuyos(){
 
 function createPuyo(x,y,col){
     var puyo = {x: x , y: y, col: col};
-    return puyo
+    return puyo;
 }
 
 function clearPuyo(x,y) {
-    // 探索済箇所
-    var marked = [] 
+    var marked = [];     // 探索済箇所
     for (var i = 0 ; i< ROWS; i++ ){
-		marked[i] = []
+		marked[i] = [];
 		for (var j = 0 ; j< COLS; j++ ){
-			marked[i][j] = 0
+			marked[i][j] = 0;
 		}
     }
 
-    //ぷよ(削除対象のぷよを指定するために利用
-    var puyo = createPuyo(x,y,board[y][x]);
-    //おなじ色のぷよグループ
-    var same_puyos = [puyo];
+    var puyo = createPuyo(x,y,board[y][x]);     //ぷよ(削除対象のぷよを指定するために利用
+    var same_puyos = [puyo];     //おなじ色のぷよグループ
 
     //ぷよが存在しなければ、なにもしない。
     if(puyo.col == 0) return false;
@@ -287,7 +284,7 @@ function findPuyos(same_puyos,marked){
     //左のぷよのチェック
 	checkPuyo(x>0,x-1,y,col,same_puyos,marked);	
     //右のぷよのチェック
-	checkPuyo(x<COLS-1,x-1,y,col,same_puyos,marked);	
+	checkPuyo(x<COLS-1,x+1,y,col,same_puyos,marked);	
     //上のぷよのチェック
 	checkPuyo(y>1,x,y-1,col,same_puyos,marked);	
     //下のぷよのチェック
