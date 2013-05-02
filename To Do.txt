@@ -1,15 +1,16 @@
-*next,�_�u��next�̕\��
-*�A��
-*�N�C�b�N�^�[��
-*��]���̔�ڒn����
-*�����Ղ�
-*�_������
-*AI�����
-*�ΐ킪�ł���悤�ɂ��� 
+*next,ダブルnextの表示
+*連鎖
+*クイックターン
+*回転時の非接地時間
+*昇竜ぷよ
+*点数つける
+*AIを作る
+*対戦ができるようにする 
+*ブロックをぷよにする
+*ぷよをなめらかに動くようにする
 
-
-*�T�C�Y�ύX6*12(+2) complete
-*�Ղ������	    complete
-*�|�[�Y             complete
-*����]             complete
-*�ݒu�֎~�ʒu�̕ύX complete
+*サイズ変更6*12(+2) complete
+*ぷよを消す	    complete
+*ポーズ             complete
+*左回転             complete
+*設置禁止位置の変更 complete
