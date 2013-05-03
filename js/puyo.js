@@ -27,14 +27,14 @@ function createColors(){
         puyocolors[ y ] = [0,0];
     }
 
-	//128回分のおちぷよ(2*128で256個)の色を決める
+    //128回分のおちぷよ(2*128で256個)の色を決める
     for (var x = 0; x < 256; x) {
-    	var cur = (Math.ceil(Math.random()*cols.length))%cols.length;
-    	if ( cols[cur] > 0 ) {
-    	    cols[cur]--;
-    	    puyocolors[x%128][Math.floor(x/128)]=colors[cur];
-    	    x++;
-    	}
+        var cur = (Math.ceil(Math.random()*cols.length))%cols.length;
+        if ( cols[cur] > 0 ) {
+            cols[cur]--;
+            puyocolors[x%128][Math.floor(x/128)]=colors[cur];
+            x++;
+        }
     }
 }
 
@@ -45,13 +45,13 @@ function init() {
             board[ y ][ x ] = 0;
         }
     }
-	createColors();
+    createColors();
 }
 
 function tick() {
     if ( valid( 0, 1 ) ) {
         ++currentY;
-	return
+        return
     }
 
     if(freeze()){
@@ -59,8 +59,8 @@ function tick() {
     }
 
     if(clear()){
-		return;
-	}
+        return;
+    }
 
     if (lose) {
         newGame();
@@ -75,9 +75,9 @@ function tick() {
 function freeze() {
     for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
-			//底についた、もしくは下にぷよがある場合
-            if ( (y + currentY) >= (ROWS - 1)  ||	
-				 board[ y + 1 +currentY][ x + currentX ] != 0){
+            //底についた、もしくは下にぷよがある場合
+            if ( (y + currentY) >= (ROWS - 1)  ||        
+                 board[ y + 1 +currentY][ x + currentX ] != 0){
                 if ( current[ y ][ x ] ) {
                     board[ y + currentY ][ x + currentX ] = current[ y ][ x ];
                     current[y][x] = 0;
@@ -86,13 +86,13 @@ function freeze() {
         }
     }
 
-	//おちぷよが残っている場合
+    //おちぷよが残っている場合
     for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
-    	    if( current[y][x] ){
-    			return true;
-    	    }
-    	}
+            if( current[y][x] ){
+                return true;
+            }
+        }
     }
     
     return false;
@@ -101,21 +101,21 @@ function freeze() {
 
 //右回転
 function rotate( current ) {
-	newX =0;
-	newY =0;
+    newX =0;
+    newY =0;
     if (current[0][0] != 0 ){
-		if ( current[0][1] != 0 ){
-			newX = - 1;
-		}else if ( current[1][0] != 0){
-			newY = 1;
-		}
-		
+        if ( current[0][1] != 0 ){
+            newX = - 1;
+        }else if ( current[1][0] != 0){
+            newY = 1;
+        }
+        
     }else if ( current[1][1] != 0 ){
-		if ( current[0][1] != 0 ){
-			newY = -1;
-		}else if ( current[1][0] != 0){
-			newX = 1;
-		}
+        if ( current[0][1] != 0 ){
+            newY = -1;
+        }else if ( current[1][0] != 0){
+            newX = 1;
+        }
     }
     
     var newCurrent = [];    
@@ -132,20 +132,20 @@ function rotate( current ) {
 //左回転
 function leftRotate( current ) {
 
-	newX =0;
-	newY =0;
+    newX =0;
+    newY =0;
     if (current[0][0] != 0 ){
-		if ( current[0][1] != 0 ){
-			newY = -1;
-		}else if ( current[1][0] != 0){
-			newX = -1;
-		}
+        if ( current[0][1] != 0 ){
+            newY = -1;
+        }else if ( current[1][0] != 0){
+            newX = -1;
+        }
     }else if ( current[1][1] != 0 ){
-		if ( current[0][1] != 0 ){
-			newX = +1;
-		}else if ( current[1][0] != 0){
-			newY = +1;
-		}
+        if ( current[0][1] != 0 ){
+            newX = +1;
+        }else if ( current[1][0] != 0){
+            newY = +1;
+        }
     }
     
     var newCurrent = [[0,0],[0,0]];    
@@ -161,10 +161,10 @@ function leftRotate( current ) {
 //一時停止/再開
 function pauseScreen(){
     if ( interval != 0 ){
-		clearInterval( interval );
-		interval = 0;
+        clearInterval( interval );
+        interval = 0;
     }else {
-		interval = setInterval( tick, 250 )
+        interval = setInterval( tick, 250 )
     }
 }
 
@@ -173,63 +173,63 @@ function clear() {
 
     var is_erased;
     is_erased = false;
- 	for ( var y = 0; y < ROWS; ++y ) {
-      	for ( var x = 0; x < COLS; ++x ) {
-			if ( board[y][x] != 0) {
-				//ボードの各要素にぷよがある場合は削除処理
-				if ( clearPuyo(x,y) ) {
-					is_erased = true;
-				}
-			}
-		}
+    for ( var y = 0; y < ROWS; ++y ) {
+        for ( var x = 0; x < COLS; ++x ) {
+            if ( board[y][x] != 0) {
+                //ボードの各要素にぷよがある場合は削除処理
+                if ( clearPuyo(x,y) ) {
+                    is_erased = true;
+                }
+            }
+        }
     }
 
-	//連鎖処理開始
+    //連鎖処理開始
     if (is_erased){
-		if (interval != 0) {
-			//tickタイマをとめる
-			clearInterval(interval);
-			interval = 0;
-			//入力処理をしない
-			inputFlag = false;
-			//連鎖用タイマ起動
-			rensaInterval = setInterval(clear,500);
-		}
-		packPuyos(); 	//空きを詰める
-		return true;
-	}
+        if (interval != 0) {
+            //tickタイマをとめる
+            clearInterval(interval);
+            interval = 0;
+            //入力処理をしない
+            inputFlag = false;
+            //連鎖用タイマ起動
+            rensaInterval = setInterval(clear,500);
+        }
+        packPuyos();         //空きを詰める
+        return true;
+    }
 
-	//連鎖終了処理
-	if (interval == 0) {
-		clearInterval(rensaInterval);
-		newShape();
-		interval = setInterval( tick, 250 );
-		inputFlag = true;		
-	}
-	return false;
+    //連鎖終了処理
+    if (interval == 0) {
+        clearInterval(rensaInterval);
+        newShape();
+        interval = setInterval( tick, 250 );
+        inputFlag = true;                
+    }
+    return false;
 
 }
 
 //ぷよをつめる
 function packPuyos(){
     for ( var x = 0; x < COLS; ++x ) {
-		for ( var y = 0; y < ROWS-1; ++y ) {
-			var starty = ROWS - y - 2
-			//ぷよが存在する場合
-			if (board[starty][x] != 0){
-				//何個下までぷよがないかを探索
-	    		var my = starty + 1
-	    		for ( ; my < ROWS; my++) {
-	    			if ( board[my][x] != 0) break;
-	    		}
-				//ぷよが下にない場合、移動
-	    		if (my != starty + 1 &&  board[my-1][x] == 0) {
-	    			board[my-1][x]  = board[starty][x];
-	    			board[starty][x] = 0;
-	    		}		
-				
-			}
-		}
+        for ( var y = 0; y < ROWS-1; ++y ) {
+            var starty = ROWS - y - 2
+            //ぷよが存在する場合
+            if (board[starty][x] != 0){
+                //何個下までぷよがないかを探索
+                var my = starty + 1
+                for ( ; my < ROWS; my++) {
+                    if ( board[my][x] != 0) break;
+                }
+                //ぷよが下にない場合、移動
+                if (my != starty + 1 &&  board[my-1][x] == 0) {
+                    board[my-1][x]  = board[starty][x];
+                    board[starty][x] = 0;
+                }                
+                
+            }
+        }
     }
     
 }
@@ -242,10 +242,10 @@ function createPuyo(x,y,col){
 function clearPuyo(x,y) {
     var marked = [];     // 探索済箇所
     for (var i = 0 ; i< ROWS; i++ ){
-		marked[i] = [];
-		for (var j = 0 ; j< COLS; j++ ){
-			marked[i][j] = 0;
-		}
+        marked[i] = [];
+        for (var j = 0 ; j< COLS; j++ ){
+            marked[i][j] = 0;
+        }
     }
 
     var puyo = createPuyo(x,y,board[y][x]);     //ぷよ(削除対象のぷよを指定するために利用
@@ -259,23 +259,23 @@ function clearPuyo(x,y) {
 
     //ぷよの集合が4つ以上からなる場合
     if(same_puyos.length >= 4){
-		while( puyo = same_puyos.pop()){
-			board[puyo.y][puyo.x] = 0;
-		}
-		return true
+        while( puyo = same_puyos.pop()){
+            board[puyo.y][puyo.x] = 0;
+        }
+        return true
     }
     return false;
 }
 
 function checkPuyo(cond,x,y,col,same_puyos,marked){
     if(cond){
-		if(board[y][x] == col ){
-			same_puyos.push(createPuyo(x,y,col)); 
-			findPuyos(same_puyos,marked);
-		}else{
-			marked[y][x] = true;
-		}
-	}
+        if(board[y][x] == col ){
+            same_puyos.push(createPuyo(x,y,col)); 
+            findPuyos(same_puyos,marked);
+        }else{
+            marked[y][x] = true;
+        }
+    }
 }
 
 function findPuyos(same_puyos,marked){
@@ -285,45 +285,45 @@ function findPuyos(same_puyos,marked){
     
     //既にsame_puyos中に同じぷよが存在していれば、なにもしない
     for(var i = 0; i<same_puyos.length; i++){
-		if (same_puyos[i].x  == puyo.x
-			&& same_puyos[i].y == puyo.y
-			&& same_puyos[i].col == puyo.col){
-			return;
-		}
+        if (same_puyos[i].x  == puyo.x
+            && same_puyos[i].y == puyo.y
+            && same_puyos[i].col == puyo.col){
+            return;
+        }
     }
     same_puyos.push(puyo);
 
     if(puyo.col == 0) {
-		marked[puyo.y][puyo.x] = true;
-		return;
+        marked[puyo.y][puyo.x] = true;
+        return;
     }
 
     //既に探索済であればなにもしない
-    if(	marked[puyo.y][puyo.x] == true) {
-		return;
+    if(        marked[puyo.y][puyo.x] == true) {
+        return;
     }
 
-	marked[puyo.y][puyo.x] = true;
+    marked[puyo.y][puyo.x] = true;
     var x = puyo.x;
     var y = puyo.y;
     var col = puyo.col;
 
     //左のぷよのチェック
-	checkPuyo(x>0,x-1,y,col,same_puyos,marked);	
+    checkPuyo(x>0,x-1,y,col,same_puyos,marked);        
     //右のぷよのチェック
-	checkPuyo(x<COLS-1,x+1,y,col,same_puyos,marked);	
+    checkPuyo(x<COLS-1,x+1,y,col,same_puyos,marked);        
     //上のぷよのチェック
-	checkPuyo(y>1,x,y-1,col,same_puyos,marked);	
+    checkPuyo(y>1,x,y-1,col,same_puyos,marked);        
     //下のぷよのチェック
-	checkPuyo(y<ROWS-1,x,y+1,col,same_puyos,marked);	
+    checkPuyo(y<ROWS-1,x,y+1,col,same_puyos,marked);        
 
 }
 
 function keyPress( key ) {
 
-	if (inputFlag == false) {
-		return;
-	}
+    if (inputFlag == false) {
+        return;
+    }
 
     switch ( key ) {
     case 'left':
@@ -345,16 +345,16 @@ function keyPress( key ) {
         var rotated = rotate( current );
         if ( valid( newX, newY, rotated ) ) {
             current = rotated;
-			currentX = currentX + newX
-			currentY = currentY + newY
+            currentX = currentX + newX
+            currentY = currentY + newY
         }
         break;
     case 'leftRotate':
         var leftRotated = leftRotate( current );
         if ( valid( newX, newY, leftRotated ) ) {
             current = leftRotated;
-			currentX = currentX + newX
-			currentY = currentY + newY
+            currentX = currentX + newX
+            currentY = currentY + newY
         }
         break;
     case 'pauseScreen':
@@ -404,12 +404,12 @@ function newGame() {
 newGame();
 
 function puyoSize() {
-	var z = 0;
-	for ( var y = 1; 0 <= y; --y ) {
+    var z = 0;
+    for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
-        	if ( current[ x ][ y ] != 0 ) {
-        		z++;
-        	}
+            if ( current[ x ][ y ] != 0 ) {
+                z++;
+            }
         }
     }
     return z;

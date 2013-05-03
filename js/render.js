@@ -39,12 +39,12 @@ function render() {
     }
 
     for ( var i = 0; i < 2; ++i ) {
-	var index = (color_index + i)%puyocolors.length;
-	var col =puyocolors[index];
+        var index = (color_index + i)%puyocolors.length;
+        var col =puyocolors[index];
         for ( var x = 0; x < 2; ++x ) {
             ctx.fillStyle =  col[x];
-	    drawSmallBlock( 4.5+i,x*0.5 )
-	}
+            drawSmallBlock( 4.5+i,x*0.5 )
+        }
     }
 
     ctx.font = "bold 20pt Sans-Serif"; 
