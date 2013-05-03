@@ -3,3 +3,11 @@ canvas {
     margin: auto;
     border: 1px solid black;
 }
+
+#description
+{
+    position:absolute; 
+    top: 0;
+    right: 0;
+    text-align:left;
+}
