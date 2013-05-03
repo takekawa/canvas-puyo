@@ -8,6 +8,11 @@ function drawBlock( x, y ) {
     ctx.strokeRect( BLOCK_W * x, BLOCK_H * y, BLOCK_W - 1 , BLOCK_H - 1 );
 }
 
+function drawSmallBlock( x, y ) {
+    ctx.fillRect( BLOCK_W * x, BLOCK_H * y, BLOCK_W/2 - 1 , BLOCK_H/2 - 1 );
+    ctx.strokeRect( BLOCK_W * x, BLOCK_H * y, BLOCK_W/2 - 1 , BLOCK_H/2 - 1 );
+}
+
 function render() {
     ctx.fillStyle = 'black';
     ctx.fillRect( 0, 0, W, H );
@@ -32,6 +37,20 @@ function render() {
             }
         }
     }
+
+    for ( var i = 0; i < 2; ++i ) {
+	var index = (color_index + i)%puyocolors.length;
+	var col =puyocolors[index];
+        for ( var x = 0; x < 2; ++x ) {
+            ctx.fillStyle =  col[x];
+	    drawSmallBlock( 4.5+i,x*0.5 )
+	}
+    }
+
+    ctx.font = "bold 20pt Sans-Serif"; 
+    ctx.fillStyle = "white"
+    ctx.fillText("点数予定地",BLOCK_H/2,BLOCK_W/2);
+    
 }
 
 setInterval( render, 30 );
