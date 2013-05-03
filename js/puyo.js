@@ -295,17 +295,17 @@ function findPuyos(same_puyos,marked){
 function keyPress( key ) {
     switch ( key ) {
     case 'left':
-        if ( valid( -1 ) ) {
+        if ( valid( -1 ) && puyoState() > 1  ) {
             --currentX;
         }
         break;
     case 'right':
-        if ( valid( 1 ) ) {
+        if ( valid( 1 ) && puyoState() > 1  ) {
             ++currentX;
         }
         break;
     case 'down':
-        if ( valid( 0, 1 ) ) {
+        if ( valid( 0, 1 ) && puyoState() > 1 ) {
             ++currentY;
         }
         break;
@@ -370,3 +370,15 @@ function newGame() {
 }
 
 newGame();
+
+function puyoState() {
+	var z = 0;
+	for ( var y = 1; 0 <= y; --y ) {
+        for ( var x = 0; x < 2; ++x ) {
+        	if ( current[ x ][ y ] != 0 ) {
+        		z++;
+        	}
+        }
+    }
+    return z;
+}   

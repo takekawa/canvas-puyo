@@ -9,7 +9,8 @@ function drawBlock( x, y ) {
 }
 
 function render() {
-    ctx.clearRect( 0, 0, W, H );
+    ctx.fillStyle = 'black';
+    ctx.fillRect( 0, 0, W, H );
 
     ctx.strokeStyle = 'black';
     for ( var x = 0; x < COLS; ++x ) {
