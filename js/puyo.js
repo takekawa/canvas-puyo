@@ -3,12 +3,14 @@ var ROWS = 14; //行数
 var board = []; //盤情報(何色のぷよがどこに存在するか?)
 var lose;     //ゲーム終了フラグ
 var interval; //tick関数用のタイマID
+var rensaInterval; //連鎖用のタイマID
 var current;  //おちているぷよの形情報
 var currentX, currentY; // おちているぷよの位置情報
 var newX, newY;         // ぷよの移動先の候補
 var colors = ['blue', 'yellow' ,'red', 'green']; //ぷよの色
 var puyocolors = []; //ぷよの色の配列(createColors参照)
 var color_index =0;  //ぷよの色の配列のインデックス
+var inputFlag=true;
 
 function newShape() {
     var col = puyocolors[color_index];
@@ -49,17 +51,24 @@ function init() {
 function tick() {
     if ( valid( 0, 1 ) ) {
         ++currentY;
-    } else {
-        if(freeze()){
-            return;
-        }
-        clear();
-        if (lose) {
-            newGame();
-            return false;
-        }    
-        newShape();
+	return
     }
+
+    if(freeze()){
+        return;
+    }
+
+    if(clear()){
+		return;
+	}
+
+    if (lose) {
+        newGame();
+        return false;
+    }    
+
+    newShape();
+
 }
 
 
@@ -163,23 +172,41 @@ function pauseScreen(){
 function clear() {
 
     var is_erased;
-    do {
-    	is_erased = false;
- 		for ( var y = 0; y < ROWS; ++y ) {
-      	    for ( var x = 0; x < COLS; ++x ) {
-				if ( board[y][x] != 0) {
-					//ボードの各要素にぷよがある場合は削除処理
-					if ( clearPuyo(x,y) ) {
-						is_erased = true;
-					}
+    is_erased = false;
+ 	for ( var y = 0; y < ROWS; ++y ) {
+      	for ( var x = 0; x < COLS; ++x ) {
+			if ( board[y][x] != 0) {
+				//ボードの各要素にぷよがある場合は削除処理
+				if ( clearPuyo(x,y) ) {
+					is_erased = true;
 				}
 			}
-    	}
-		//空きができたら詰める
-    	if (is_erased) packPuyos();
+		}
+    }
 
-    }while(is_erased);
+	//連鎖処理開始
+    if (is_erased){
+		if (interval != 0) {
+			//tickタイマをとめる
+			clearInterval(interval);
+			interval = 0;
+			//入力処理をしない
+			inputFlag = false;
+			//連鎖用タイマ起動
+			rensaInterval = setInterval(clear,500);
+		}
+		packPuyos(); 	//空きを詰める
+		return true;
+	}
 
+	//連鎖終了処理
+	if (interval == 0) {
+		clearInterval(rensaInterval);
+		newShape();
+		interval = setInterval( tick, 250 );
+		inputFlag = true;		
+	}
+	return false;
 
 }
 
@@ -293,19 +320,24 @@ function findPuyos(same_puyos,marked){
 }
 
 function keyPress( key ) {
+
+	if (inputFlag == false) {
+		return;
+	}
+
     switch ( key ) {
     case 'left':
-        if ( valid( -1 ) && puyoState() > 1  ) {
+        if ( valid( -1 ) && puyoSize() > 1  ) {
             --currentX;
         }
         break;
     case 'right':
-        if ( valid( 1 ) && puyoState() > 1  ) {
+        if ( valid( 1 ) && puyoSize() > 1  ) {
             ++currentX;
         }
         break;
     case 'down':
-        if ( valid( 0, 1 ) && puyoState() > 1 ) {
+        if ( valid( 0, 1 ) && puyoSize() > 1 ) {
             ++currentY;
         }
         break;
@@ -371,7 +403,7 @@ function newGame() {
 
 newGame();
 
-function puyoState() {
+function puyoSize() {
 	var z = 0;
 	for ( var y = 1; 0 <= y; --y ) {
         for ( var x = 0; x < 2; ++x ) {
