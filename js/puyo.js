@@ -11,6 +11,9 @@ var colors = ['blue', 'yellow' ,'red', 'green']; //ぷよの色
 var puyocolors = []; //ぷよの色の配列(createColors参照)
 var color_index =0;  //ぷよの色の配列のインデックス
 var inputFlag=true;
+var rensaCount = 0;
+var puyoGroup = [];
+var score = 0;
 
 function newShape() {
     var col = puyocolors[color_index];
@@ -185,7 +188,7 @@ function clear() {
     }
 
     //連鎖処理開始
-    if (is_erased){
+    if (is_erased){ 
         if (interval != 0) {
             //tickタイマをとめる
             clearInterval(interval);
@@ -193,10 +196,14 @@ function clear() {
             //入力処理をしない
             inputFlag = false;
             //連鎖用タイマ起動
-            rensaInterval = setInterval(clear,500);
+            rensaInterval = setInterval(clear,1500);
         }
+        scorer();
         packPuyos();         //空きを詰める
+        rensaCount++;
+        puyoGroup = [];
         return true;
+
     }
 
     //連鎖終了処理
@@ -204,7 +211,8 @@ function clear() {
         clearInterval(rensaInterval);
         newShape();
         interval = setInterval( tick, 250 );
-        inputFlag = true;                
+        inputFlag = true;
+        rensaCount = 0                
     }
     return false;
 
@@ -259,6 +267,8 @@ function clearPuyo(x,y) {
 
     //ぷよの集合が4つ以上からなる場合
     if(same_puyos.length >= 4){
+    	var pi = { size: same_puyos.length, color: same_puyos[ 0 ].col };
+    	puyoGroup.push(pi);
         while( puyo = same_puyos.pop()){
             board[puyo.y][puyo.x] = 0;
         }
@@ -393,12 +403,44 @@ function valid( offsetX, offsetY, newCurrent ) {
     return true;
 }
 
+function scorer() {
+	var colorBonus = [ 0, 0, 3, 6, 12];
+	var rensaBonus = [ 0, 8, 16, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512, 544];
+	var connectBonus = [ 0, 0, 0, 0, 0, 2, 3, 4, 5, 6, 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,];
+	var currentBonus = 0;
+	var erasedPuyos = 0;
+	var uniquecolors = []
+	for ( var  x = 0; x < puyoGroup.length; x++ ) {
+		currentBonus = currentBonus + connectBonus[puyoGroup[x].size];
+	}
+	currentBonus = currentBonus + rensaBonus[rensaCount];
+	for ( var  y = 0; y < puyoGroup.length; y++ ) {
+		erasedPuyos = erasedPuyos + puyoGroup[y].size;
+	}
+	for ( var  z = 0; z < puyoGroup.length; z++ ) {
+		var inserted = false;
+		for ( var i = 0; i < uniquecolors.length; i++ ) {
+			if ( uniquecolors[i] == puyoGroup[z].color ) {
+				inserted = true;
+				break;
+			}
+		}
+		if ( inserted == false ) {
+			uniquecolors.push(puyoGroup[z].color);
+		}
+	}
+	currentBonus = currentBonus + connectBonus[uniquecolors.length];
+	currentBonus = currentBonus || 1;
+	score = score + currentBonus*10*erasedPuyos;
+}
+
 function newGame() {
     clearInterval(interval);
     init();
     newShape();
     lose = false;
     interval = setInterval( tick, 250 );
+    score = 0;
 }
 
 newGame();

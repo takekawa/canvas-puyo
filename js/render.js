@@ -49,7 +49,7 @@ function render() {
 
     ctx.font = "bold 20pt Sans-Serif"; 
     ctx.fillStyle = "white"
-    ctx.fillText("点数予定地",BLOCK_H/2,BLOCK_W/2);
+    ctx.fillText(score,BLOCK_H/2,BLOCK_W/2);
     
 }
 
