@@ -14,6 +14,12 @@ var inputFlag=true;
 var rensaCount = 0;
 var puyoGroup = [];
 var score = 0;
+var anotherX = 0;
+var anotherY = 0;
+
+function ojama(){
+    alert("ojama")
+}
 
 function newShape() {
     var col = puyocolors[color_index];
@@ -107,17 +113,29 @@ function rotate( current ) {
     newX =0;
     newY =0;
     if (current[0][0] != 0 ){
-        if ( current[0][1] != 0 ){
-            newX = - 1;
-        }else if ( current[1][0] != 0){
-            newY = 1;
+        if ( current[0][1] != 0 ){  //  **
+            newX = - 1;             //  --
+	        if(currentY == 13 || board[currentY+2][currentX] !=0 ){
+		        newY--;
+	        }
+        }else if ( current[1][0] != 0){  //  *-
+            newY = 1;                    //  *-
+	        if(currentX == 5){
+		        newX--;
+	        }else if(board[currentY+1][currentX+newX+1] != 0){
+		        newY--;
+	        }
         }
         
     }else if ( current[1][1] != 0 ){
-        if ( current[0][1] != 0 ){
-            newY = -1;
-        }else if ( current[1][0] != 0){
-            newX = 1;
+        if ( current[0][1] != 0 ){  //  --
+            newY = -1;              //  **
+            if ( currentX == -1 ) {
+            	newX++;
+            	newY++;
+            }
+        }else if ( current[1][0] != 0){ //  -*
+            newX = 1;                   //  -*
         }
     }
     
@@ -138,15 +156,20 @@ function leftRotate( current ) {
     newX =0;
     newY =0;
     if (current[0][0] != 0 ){
-        if ( current[0][1] != 0 ){
+        if ( current[0][1] != 0 ){ //  **
+	        //  --
             newY = -1;
-        }else if ( current[1][0] != 0){
+        }else if ( current[1][0] != 0){  //  *-
+	        //  *- 
             newX = -1;
         }
-    }else if ( current[1][1] != 0 ){
-        if ( current[0][1] != 0 ){
+    }else if ( current[1][1] != 0 ){     
+        if ( current[0][1] != 0 ){       //  -- 
+            //  **    
             newX = +1;
-        }else if ( current[1][0] != 0){
+
+        }else if ( current[1][0] != 0){  //  -*
+            //  -*
             newY = +1;
         }
     }
@@ -196,7 +219,7 @@ function clear() {
             //入力処理をしない
             inputFlag = false;
             //連鎖用タイマ起動
-            rensaInterval = setInterval(clear,1500);
+            rensaInterval = setInterval(clear,500);
         }
         scorer();
         packPuyos();         //空きを詰める
@@ -353,18 +376,28 @@ function keyPress( key ) {
         break;
     case 'rotate':
         var rotated = rotate( current );
+        //        f0001( rotated );
         if ( valid( newX, newY, rotated ) ) {
             current = rotated;
             currentX = currentX + newX
             currentY = currentY + newY
+        }else if ( valid( newX + anotherX, newY + anotherY, rotated ) ) {
+        	current = rotated;
+            currentX = currentX + newX + anotherX
+            currentY = currentY + newY + anotherY;
         }
         break;
     case 'leftRotate':
         var leftRotated = leftRotate( current );
+        f0001( leftRotated );
         if ( valid( newX, newY, leftRotated ) ) {
-            current = leftRotated;
+            current = leftRotated
             currentX = currentX + newX
-            currentY = currentY + newY
+            currentY = currentY + newY;
+        }else if ( valid( newX + anotherX, newY + anotherY, leftRotated ) ) {
+        	current = leftRotated;
+            currentX = currentX + newX + anotherX
+            currentY = currentY + newY + anotherY;
         }
         break;
     case 'pauseScreen':

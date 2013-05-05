@@ -10,6 +10,7 @@
         <script src='js/puyo.js'></script>
         <script src='js/controller.js'></script>
         <script src='js/render.js'></script>
+        <script src='js/sisakuyou.js'></script>
     <div id="description" >	
         <br> 右回転 : ↑ or x <br>
         左回転 : z <br>
@@ -17,6 +18,15 @@
         右移動:  → <br>
         左移動 : ← <br>
         ポーズ/解除 : ENTER <br>
+	<form name="ojama" >
+	  <select name="ojamanum">
+	    <option value ="0"> 0
+	    <option value ="1"> 1
+	    <option value ="6"> 6
+	    <option value ="18" selected > 18
+          </select> 
+	  <input type="button" value="発射" onClick "ojama()">
+        </form>
     </div>
     </body>
 </html>
