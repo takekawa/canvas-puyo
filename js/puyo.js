@@ -7,7 +7,7 @@ var rensaInterval; //連鎖用のタイマID
 var current;  //おちているぷよの形情報
 var currentX, currentY; // おちているぷよの位置情報
 var newX, newY;         // ぷよの移動先の候補
-var colors = ['blue', 'yellow' ,'red', 'green']; //ぷよの色
+var colors = ['blue', 'yellow' ,'red', 'green', 'gray']; //ぷよの色
 var puyocolors = []; //ぷよの色の配列(createColors参照)
 var color_index =0;  //ぷよの色の配列のインデックス
 var inputFlag=true;
@@ -16,10 +16,6 @@ var puyoGroup = [];
 var score = 0;
 var anotherX = 0;
 var anotherY = 0;
-
-function ojama(){
-    alert("ojama")
-}
 
 function newShape() {
     var col = puyocolors[color_index];
@@ -114,8 +110,9 @@ function rotate( current ) {
     newY =0;
     if (current[0][0] != 0 ){
         if ( current[0][1] != 0 ){  //  **
-            newX = - 1;             //  --
-	        if(currentY == 13 || board[currentY+2][currentX] !=0 ){
+            newX = - 1;
+                         //  --
+	        if(currentY == 13 || board[currentY+1][currentX] != 0 ) {
 		        newY--;
 	        }
         }else if ( current[1][0] != 0){  //  *-
@@ -162,15 +159,24 @@ function leftRotate( current ) {
         }else if ( current[1][0] != 0){  //  *-
 	        //  *- 
             newX = -1;
+            if ( board[ currentY + 1 ][ currentX - 1 ] != 0 ) {
+            	newX++;
+            }
         }
     }else if ( current[1][1] != 0 ){     
         if ( current[0][1] != 0 ){       //  -- 
             //  **    
             newX = +1;
+            if ( board[ currentY ][ currentX + 2 ] != 0 ) {
+            	newX--;
+            }
 
         }else if ( current[1][0] != 0){  //  -*
             //  -*
             newY = +1;
+            if ( currentY == 12 || board[ currentY + 2 ][ currentX + 1 ] != 0 ) {
+            	newY--;
+            }
         }
     }
     
@@ -283,7 +289,7 @@ function clearPuyo(x,y) {
     var same_puyos = [puyo];     //おなじ色のぷよグループ
 
     //ぷよが存在しなければ、なにもしない。
-    if(puyo.col == 0) return false;
+    if( puyo.col == 0 || puyo.col == 'gray') return false;
 
     //同じ色のぷよを探す
     findPuyos(same_puyos,marked);
@@ -293,6 +299,7 @@ function clearPuyo(x,y) {
     	var pi = { size: same_puyos.length, color: same_puyos[ 0 ].col };
     	puyoGroup.push(pi);
         while( puyo = same_puyos.pop()){
+        	clearOPuyo( puyo );
             board[puyo.y][puyo.x] = 0;
         }
         return true
@@ -465,6 +472,21 @@ function scorer() {
 	currentBonus = currentBonus + connectBonus[uniquecolors.length];
 	currentBonus = currentBonus || 1;
 	score = score + currentBonus*10*erasedPuyos;
+}
+
+function clearOPuyo( puyo ) {
+	for ( var x = -1 ; x < 2; x++ ) {
+		for ( var y = -1 ; y < 2; y++ ) {
+			if ( Math.abs(x) != Math.abs(y) &&  
+			0 <= (puyo.y + y) &&  
+			(puyo.y + y) < board.length &&
+			0 <= (puyo.x + x) && 
+			(puyo.x + x) < board[0].length &&
+			board[puyo.y + y][puyo.x + x] == 'gray' ) {
+				board[puyo.y + y][puyo.x + x] = 0;
+			} 
+		}
+	}
 }
 
 function newGame() {
